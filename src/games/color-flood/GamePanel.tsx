@@ -28,77 +28,62 @@ export default function GamePanel({
     state.phase === "playing" ? getAvailableColors(state) : [];
   const currentColor =
     state.phase === "playing" ? PLAYER_COLORS[state.currentPlayer] : "#fff";
+  const totalOwned = state.players.reduce((s, p) => s + p.cellCount, 0);
+  const pctDone = Math.round((totalOwned / state.totalCells) * 100);
 
   return (
-    <div className="flex w-80 flex-col gap-4">
-      {/* ===== TURN + ACTION GUIDE ===== */}
+    <div className="flex w-72 flex-col gap-3">
+      {/* Turn + What to do */}
       {state.phase === "playing" && (
         <div
-          className="rounded-xl border-2 p-5"
+          className="rounded-xl border-2 p-4"
           style={{
             borderColor: currentColor,
-            boxShadow: `0 0 20px ${currentColor}33`,
+            boxShadow: `0 0 15px ${currentColor}25`,
           }}
         >
-          <p className="mb-1 text-xs uppercase tracking-wider text-gray-500">
+          <p className="text-[10px] uppercase tracking-wider text-gray-500">
             Your Turn
           </p>
           <p
-            className="mb-3 text-2xl font-extrabold"
+            className="mb-2 text-lg font-extrabold"
             style={{ color: currentColor }}
           >
             {state.players[state.currentPlayer].name}
           </p>
-
-          <div className="rounded-lg bg-white/5 p-3">
-            <p className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">
-              What to do:
-            </p>
-            <p className="text-sm text-gray-300">
-              Pick one of the <strong className="text-white">glowing color buttons</strong>{" "}
-              below. Your territory will{" "}
-              <strong className="text-white">grow</strong> by absorbing nearby
-              cells of that color!
-            </p>
+          <div className="rounded-md bg-white/5 px-2.5 py-2 text-xs text-gray-400">
+            👇 Pick a <strong className="text-gray-300">color below</strong> to
+            flood your territory and absorb nearby cells
           </div>
-
-          <p className="mt-3 flex items-center gap-1.5 text-xs text-gray-500">
-            <span className="text-base">👇</span>
-            Choose a color below to expand your territory
-          </p>
         </div>
       )}
 
       {/* Winner */}
       {state.phase === "finished" && state.winner !== null && (
-        <div className="rounded-xl border-2 border-yellow-500 bg-yellow-500/10 p-5 text-center">
-          <p className="text-4xl">🏆</p>
-          <p className="mt-2 text-2xl font-extrabold text-yellow-400">
+        <div className="rounded-xl border-2 border-yellow-500 bg-yellow-500/10 p-4 text-center">
+          <p className="text-3xl">🏆</p>
+          <p className="mt-1 text-xl font-extrabold text-yellow-400">
             {state.players[state.winner].name} Wins!
           </p>
-          <p className="mt-1 text-sm text-gray-400">
-            Captured {state.players[state.winner].cellCount} out of{" "}
-            {state.totalCells} cells
+          <p className="text-xs text-gray-400">
+            {state.players[state.winner].cellCount}/{state.totalCells} cells
           </p>
           <button
             onClick={onRestart}
-            className="mt-4 w-full rounded-xl bg-yellow-500/20 px-4 py-2 font-bold text-yellow-400 transition-all hover:bg-yellow-500/30"
+            className="mt-3 w-full rounded-lg bg-yellow-500/20 py-1.5 text-sm font-bold text-yellow-400 hover:bg-yellow-500/30"
           >
             Play Again
           </button>
         </div>
       )}
 
-      {/* ===== COLOR PICKER ===== */}
+      {/* Color Picker */}
       {state.phase === "playing" && (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-          <p className="mb-1 text-sm font-semibold text-white">
-            Pick a Color to Flood
+        <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+          <p className="mb-2 text-xs font-semibold text-gray-400">
+            Pick a Color
           </p>
-          <p className="mb-3 text-xs text-gray-500">
-            Greyed-out colors are already in use by a player
-          </p>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-6 gap-1.5">
             {FLOOD_COLORS.map((color) => {
               const isAvailable = available.includes(color);
               return (
@@ -106,33 +91,21 @@ export default function GamePanel({
                   key={color}
                   onClick={() => isAvailable && onPickColor(color)}
                   disabled={!isAvailable}
-                  className={`flex flex-col items-center gap-1.5 rounded-lg border-2 p-2.5 transition-all ${
+                  className={`flex flex-col items-center gap-0.5 rounded-md border-2 p-1.5 transition-all ${
                     isAvailable
-                      ? "border-white/30 hover:scale-110 hover:border-white/60 hover:shadow-lg"
+                      ? "border-white/20 hover:scale-110 hover:border-white/50"
                       : "cursor-not-allowed border-white/5 opacity-25"
                   }`}
-                  style={
-                    isAvailable
-                      ? { boxShadow: `0 0 12px ${color}44` }
-                      : undefined
-                  }
+                  title={isAvailable ? `Pick ${COLOR_NAMES[color]}` : "In use"}
                 >
                   <div
-                    className={`h-10 w-10 rounded-md ${
-                      isAvailable ? "animate-pulse" : ""
-                    }`}
+                    className="h-7 w-7 rounded"
                     style={{
                       backgroundColor: color,
-                      boxShadow: isAvailable
-                        ? `0 0 15px ${color}66`
-                        : "none",
+                      boxShadow: isAvailable ? `0 0 8px ${color}55` : "none",
                     }}
                   />
-                  <span
-                    className={`text-xs font-medium ${
-                      isAvailable ? "text-gray-300" : "text-gray-600"
-                    }`}
-                  >
+                  <span className="text-[8px] text-gray-600">
                     {COLOR_NAMES[color]}
                   </span>
                 </button>
@@ -142,129 +115,54 @@ export default function GamePanel({
         </div>
       )}
 
-      {/* ===== SCOREBOARD ===== */}
-      <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-        <p className="mb-3 text-sm font-semibold text-gray-400">
-          Territory Leaderboard
-        </p>
-        <div className="space-y-3">
-          {state.players
-            .map((player, i) => ({ ...player, index: i }))
-            .sort((a, b) => b.cellCount - a.cellCount)
-            .map((player) => {
-              const pct = Math.round(
-                (player.cellCount / state.totalCells) * 100
-              );
-              const isCurrent =
-                state.phase === "playing" &&
-                player.index === state.currentPlayer;
-              return (
+      {/* Scoreboard */}
+      <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+        <div className="mb-2 flex items-center justify-between">
+          <span className="text-xs font-semibold text-gray-400">Territory</span>
+          <span className="text-xs text-gray-600">{pctDone}% captured</span>
+        </div>
+        <div className="space-y-1.5">
+          {state.players.map((player, i) => {
+            const pct = Math.round(
+              (player.cellCount / state.totalCells) * 100
+            );
+            return (
+              <div key={i}>
                 <div
-                  key={player.index}
-                  className="space-y-1"
-                  style={
-                    isCurrent
-                      ? { boxShadow: `0 0 0 1px ${player.color}`, borderRadius: 8, padding: 6 }
-                      : { padding: 6 }
-                  }
+                  className={`flex items-center justify-between rounded-md px-2.5 py-1.5 ${
+                    state.phase === "playing" && i === state.currentPlayer
+                      ? "bg-white/10"
+                      : "bg-white/[0.03]"
+                  }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="h-3 w-3 rounded-full"
-                        style={{ backgroundColor: player.color }}
-                      />
-                      <span className="text-sm font-medium">
-                        {player.name}
-                      </span>
-                      {isCurrent && (
-                        <span className="text-xs text-gray-500">
-                          ← playing
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-sm font-bold">
-                      {player.cellCount} cells ({pct}%)
-                    </span>
-                  </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-white/10">
+                  <div className="flex items-center gap-2">
                     <div
-                      className="h-full rounded-full transition-all duration-500"
-                      style={{
-                        width: `${pct}%`,
-                        backgroundColor: player.color,
-                      }}
+                      className="h-2.5 w-2.5 rounded-full"
+                      style={{ backgroundColor: player.color }}
                     />
+                    <span className="text-xs font-medium">{player.name}</span>
                   </div>
+                  <span className="text-xs font-bold">
+                    {player.cellCount} ({pct}%)
+                  </span>
                 </div>
-              );
-            })}
+                <div className="mt-1 h-1 overflow-hidden rounded-full bg-white/10">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{ width: `${pct}%`, backgroundColor: player.color }}
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
-
-      {/* Board Progress */}
-      <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-400">Board Captured</span>
-          <span className="font-bold">
-            {Math.round(
-              (state.players.reduce((s, p) => s + p.cellCount, 0) /
-                state.totalCells) *
-                100
-            )}
-            %
-          </span>
-        </div>
-        <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-500"
-            style={{
-              width: `${
-                (state.players.reduce((s, p) => s + p.cellCount, 0) /
-                  state.totalCells) *
-                100
-              }%`,
-            }}
-          />
-        </div>
-        <p className="mt-2 text-xs text-gray-600">
-          Game ends when every cell on the board is captured
-        </p>
-      </div>
-
-      {/* Quick Help */}
-      {state.phase === "playing" && (
-        <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
-          <p className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-500">
-            Quick Help
-          </p>
-          <div className="space-y-1.5 text-xs text-gray-500">
-            <p>
-              🏠 You start from a <strong className="text-gray-400">corner</strong>{" "}
-              (marked with your number)
-            </p>
-            <p>
-              🎨 Pick a color →{" "}
-              <strong className="text-gray-400">your whole territory</strong>{" "}
-              changes to that color
-            </p>
-            <p>
-              🌊 Neighboring cells of the same color{" "}
-              <strong className="text-gray-400">join your territory</strong>
-            </p>
-            <p>
-              🏆 Capture the{" "}
-              <strong className="text-gray-400">most cells</strong> to win!
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Restart */}
       {state.phase === "playing" && (
         <button
           onClick={onRestart}
-          className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-400 transition-all hover:bg-white/10 hover:text-white"
+          className="rounded-lg border border-white/10 bg-white/5 py-1.5 text-xs text-gray-500 hover:bg-white/10 hover:text-white"
         >
           🔄 Start Over
         </button>

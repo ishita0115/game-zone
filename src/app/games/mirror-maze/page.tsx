@@ -55,18 +55,18 @@ export default function MirrorMazePage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center px-4 py-8">
-      <div className="mb-6 flex items-center gap-4">
+    <div className="flex min-h-screen flex-col items-center px-4 py-4">
+      <div className="mb-3 flex items-center gap-3">
         <Link
           href="/"
-          className="rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-sm text-gray-400 transition-all hover:bg-white/10 hover:text-white"
+          className="rounded-md border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-gray-400 transition-all hover:bg-white/10 hover:text-white"
         >
-          ← Back
+          ← Home
         </Link>
-        <h1 className="text-glow text-3xl font-extrabold">🪞 Mirror Maze</h1>
+        <h1 className="text-glow text-2xl font-extrabold">🪞 Mirror Maze</h1>
       </div>
 
-      <div className="flex flex-wrap items-start justify-center gap-8">
+      <div className="flex flex-wrap items-start justify-center gap-6">
         <Board state={gameState} onCellClick={handleCellClick} />
         <GamePanel
           state={gameState}

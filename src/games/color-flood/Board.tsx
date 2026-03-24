@@ -11,28 +11,8 @@ const CELL_SIZE = 48;
 const BOARD_PX = CELL_SIZE * GRID_SIZE;
 
 export default function Board({ state }: BoardProps) {
-  const totalOwned = state.players.reduce((s, p) => s + p.cellCount, 0);
-  const unowned = state.totalCells - totalOwned;
-
   return (
-    <div className="flex flex-col items-center gap-3">
-      {/* Board legend */}
-      <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-gray-400">
-        <div className="flex items-center gap-1.5">
-          <div className="h-3 w-3 rounded-sm bg-white/30" />
-          <span>Unclaimed ({unowned})</span>
-        </div>
-        {state.players.map((p, i) => (
-          <div key={i} className="flex items-center gap-1.5">
-            <div
-              className="h-3 w-3 rounded-sm border-2"
-              style={{ borderColor: PLAYER_COLORS[i], backgroundColor: `${PLAYER_COLORS[i]}33` }}
-            />
-            <span>{p.name} ({p.cellCount})</span>
-          </div>
-        ))}
-      </div>
-
+    <div>
       <div
         className="relative overflow-hidden rounded-xl border-2 border-white/10"
         style={{ width: BOARD_PX, height: BOARD_PX }}

@@ -2,14 +2,13 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
-import { GameState } from "@/games/color-flood/types";
-import { FloodColor } from "@/games/color-flood/types";
-import { createInitialState, pickColor } from "@/games/color-flood/engine";
-import GameSetup from "@/games/color-flood/GameSetup";
-import Board from "@/games/color-flood/Board";
-import GamePanel from "@/games/color-flood/GamePanel";
+import { GameState, LineDirection } from "@/games/dots-and-boxes/types";
+import { createInitialState, drawLine } from "@/games/dots-and-boxes/engine";
+import GameSetup from "@/games/dots-and-boxes/GameSetup";
+import Board from "@/games/dots-and-boxes/Board";
+import GamePanel from "@/games/dots-and-boxes/GamePanel";
 
-export default function ColorFloodPage() {
+export default function DotsAndBoxesPage() {
   const [gameState, setGameState] = useState<GameState | null>(null);
 
   const handleStart = useCallback(
@@ -19,10 +18,10 @@ export default function ColorFloodPage() {
     []
   );
 
-  const handlePickColor = useCallback(
-    (color: FloodColor) => {
+  const handleLineClick = useCallback(
+    (row: number, col: number, dir: LineDirection) => {
       if (!gameState || gameState.phase !== "playing") return;
-      const newState = pickColor(gameState, color);
+      const newState = drawLine(gameState, row, col, dir);
       if (newState) setGameState(newState);
     },
     [gameState]
@@ -45,16 +44,12 @@ export default function ColorFloodPage() {
         >
           ← Home
         </Link>
-        <h1 className="text-glow text-2xl font-extrabold">🌊 Color Flood</h1>
+        <h1 className="text-glow text-2xl font-extrabold">🔲 Dots & Boxes</h1>
       </div>
 
       <div className="flex flex-wrap items-start justify-center gap-6">
-        <Board state={gameState} />
-        <GamePanel
-          state={gameState}
-          onPickColor={handlePickColor}
-          onRestart={handleRestart}
-        />
+        <Board state={gameState} onLineClick={handleLineClick} />
+        <GamePanel state={gameState} onRestart={handleRestart} />
       </div>
     </div>
   );

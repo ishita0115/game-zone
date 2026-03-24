@@ -1,21 +1,17 @@
 "use client";
 
-import { GameState, MirrorType } from "./types";
+import { GameState } from "./types";
 import { PLAYER_COLORS } from "@/types/game";
 
 interface GamePanelProps {
   state: GameState;
-  onSelectMirror: (type: MirrorType) => void;
   onRestart: () => void;
 }
 
-export default function GamePanel({
-  state,
-  onSelectMirror,
-  onRestart,
-}: GamePanelProps) {
+export default function GamePanel({ state, onRestart }: GamePanelProps) {
   const currentColor =
     state.phase === "playing" ? PLAYER_COLORS[state.currentPlayer] : "#fff";
+  const totalScored = state.players.reduce((s, p) => s + p.score, 0);
 
   return (
     <div className="flex w-72 flex-col gap-3">
@@ -28,26 +24,21 @@ export default function GamePanel({
             boxShadow: `0 0 15px ${currentColor}25`,
           }}
         >
-          <div className="mb-2 flex items-center justify-between">
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-gray-500">
-                Your Turn
-              </p>
-              <p
-                className="text-lg font-extrabold"
-                style={{ color: currentColor }}
-              >
-                {state.players[state.currentPlayer].name}
-              </p>
-            </div>
-            <span className="text-xs text-gray-500">
-              🪞 {state.players[state.currentPlayer].mirrorsLeft} left
-            </span>
-          </div>
+          <p className="text-[10px] uppercase tracking-wider text-gray-500">
+            Your Turn
+          </p>
+          <p
+            className="mb-2 text-lg font-extrabold"
+            style={{ color: currentColor }}
+          >
+            {state.players[state.currentPlayer].name}
+          </p>
           <div className="rounded-md bg-white/5 px-2.5 py-2 text-xs text-gray-400">
-            <span className="font-medium text-gray-300">1.</span> Pick mirror
-            below &rarr; <span className="font-medium text-gray-300">2.</span>{" "}
-            Click empty cell on board
+            👇 Click the{" "}
+            <strong className="text-gray-300">
+              faded space between two dots
+            </strong>{" "}
+            to draw a line. Complete a box = bonus turn!
           </div>
         </div>
       )}
@@ -60,7 +51,7 @@ export default function GamePanel({
             {state.players[state.winner].name} Wins!
           </p>
           <p className="text-xs text-gray-400">
-            {state.players[state.winner].score} gems captured
+            {state.players[state.winner].score}/{state.totalBoxes} boxes
           </p>
           <button
             onClick={onRestart}
@@ -71,48 +62,12 @@ export default function GamePanel({
         </div>
       )}
 
-      {/* Mirror Selector */}
-      {state.phase === "playing" && (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-          <p className="mb-2 text-xs font-semibold text-gray-400">
-            Pick Mirror Shape
-          </p>
-          <div className="flex gap-2">
-            {(["/" as const, "\\" as const]).map((type) => {
-              const isSelected = state.selectedMirror === type;
-              return (
-                <button
-                  key={type}
-                  onClick={() => onSelectMirror(type)}
-                  className={`flex flex-1 flex-col items-center rounded-lg border-2 py-2 transition-all ${
-                    isSelected
-                      ? "border-violet-500 bg-violet-500/20 scale-105"
-                      : "border-white/10 bg-white/5 hover:border-white/20"
-                  }`}
-                >
-                  <svg width="32" height="32" viewBox="0 0 40 40">
-                    {type === "/" ? (
-                      <line x1="8" y1="32" x2="32" y2="8" stroke={isSelected ? "#a78bfa" : "white"} strokeWidth="3" strokeLinecap="round" />
-                    ) : (
-                      <line x1="8" y1="8" x2="32" y2="32" stroke={isSelected ? "#a78bfa" : "white"} strokeWidth="3" strokeLinecap="round" />
-                    )}
-                  </svg>
-                  <span className="text-[10px] text-gray-500">
-                    {type === "/" ? "/ Left" : "\\ Right"}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
       {/* Scoreboard */}
       <div className="rounded-xl border border-white/10 bg-white/5 p-3">
         <div className="mb-2 flex items-center justify-between">
           <span className="text-xs font-semibold text-gray-400">Score</span>
           <span className="text-xs text-gray-600">
-            💎 {state.claimedGems}/{state.totalGems}
+            📦 {totalScored}/{state.totalBoxes}
           </span>
         </div>
         <div className="space-y-1.5">
@@ -139,9 +94,9 @@ export default function GamePanel({
         {/* Progress bar */}
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-500 transition-all duration-500"
+            className="h-full rounded-full bg-gradient-to-r from-orange-500 to-amber-500 transition-all duration-500"
             style={{
-              width: `${(state.claimedGems / state.totalGems) * 100}%`,
+              width: `${(totalScored / state.totalBoxes) * 100}%`,
             }}
           />
         </div>

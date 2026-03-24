@@ -158,25 +158,10 @@ export default function Board({ state, onCellClick }: BoardProps) {
   const currentColor = PLAYER_COLORS[state.currentPlayer];
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      {/* Board instruction banner */}
-      {state.phase === "playing" && (
-        <div
-          className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium animate-pulse"
-          style={{
-            borderColor: currentColor,
-            backgroundColor: `${currentColor}15`,
-            color: currentColor,
-          }}
-        >
-          <span className="text-lg">👇</span>
-          Click any dark cell on the board to place your mirror
-        </div>
-      )}
-
+    <div>
       <div
         className="relative"
-        style={{ width: BOARD_PX, height: BOARD_PX, margin: "30px" }}
+        style={{ width: BOARD_PX, height: BOARD_PX, margin: "20px" }}
       >
         <LaserSourceIndicators playerCount={state.playerCount} />
         <LaserSVG segments={state.laserSegments} />

@@ -15,22 +15,24 @@ export default function GameSetup({ onStart }: GameSetupProps) {
     <div className="flex min-h-screen items-center justify-center px-4 py-6">
       <div className="w-full max-w-2xl">
         <h1 className="text-glow mb-1 text-center text-4xl font-extrabold">
-          🪞 Mirror Maze
+          🔲 Dots & Boxes
         </h1>
-        <p className="mb-6 text-center text-sm text-gray-500">Laser Battle</p>
+        <p className="mb-6 text-center text-sm text-gray-500">
+          Connect the Dots!
+        </p>
 
         <div className="grid gap-4 sm:grid-cols-2">
           {/* Left: How it works */}
-          <div className="rounded-2xl border border-violet-500/20 bg-violet-500/5 p-5">
-            <p className="mb-3 text-sm font-bold text-violet-300">
+          <div className="rounded-2xl border border-orange-500/20 bg-orange-500/5 p-5">
+            <p className="mb-3 text-sm font-bold text-orange-300">
               How it works
             </p>
             <div className="space-y-2.5">
               {[
-                ["🔦", "Your laser shoots from the edge of the board"],
-                ["🪞", "Place mirrors on empty cells to bounce the laser"],
-                ["💎", "Redirect your laser to hit gems and score points!"],
-                ["🏆", "Most gems at the end wins!"],
+                ["🔗", "Click between two dots to draw a line"],
+                ["📦", "Complete all 4 sides of a box to claim it"],
+                ["🎯", "Completing a box gives you another turn!"],
+                ["🏆", "Player with the most boxes wins!"],
               ].map(([icon, text], i) => (
                 <div key={i} className="flex items-start gap-2.5">
                   <span className="text-base">{icon}</span>
@@ -51,7 +53,7 @@ export default function GameSetup({ onStart }: GameSetupProps) {
                     onClick={() => setPlayerCount(n)}
                     className={`flex-1 rounded-lg border-2 py-2 text-sm font-bold transition-all ${
                       playerCount === n
-                        ? "border-violet-500 bg-violet-500/20 text-white"
+                        ? "border-orange-500 bg-orange-500/20 text-white"
                         : "border-white/10 bg-white/5 text-gray-500 hover:border-white/20"
                     }`}
                   >
@@ -77,7 +79,7 @@ export default function GameSetup({ onStart }: GameSetupProps) {
                       setNames(copy);
                     }}
                     placeholder={`Player ${i + 1}`}
-                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white outline-none focus:border-violet-500"
+                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white outline-none focus:border-orange-500"
                   />
                 </div>
               ))}
@@ -87,7 +89,7 @@ export default function GameSetup({ onStart }: GameSetupProps) {
               onClick={() =>
                 onStart(playerCount, names.slice(0, playerCount))
               }
-              className="w-full rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 py-3 text-base font-bold transition-all hover:scale-105 hover:shadow-lg hover:shadow-violet-500/25"
+              className="w-full rounded-xl bg-gradient-to-r from-orange-600 to-amber-500 py-3 text-base font-bold transition-all hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25"
             >
               Start Playing!
             </button>
