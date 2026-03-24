@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Difficulty, PLAYER_COLORS, PLAYER_NAMES_DEFAULT } from "@/types/game";
 import DifficultySelector from "@/components/DifficultySelector";
 
@@ -16,6 +17,7 @@ export default function GameSetup({ onStart }: GameSetupProps) {
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-6">
       <div className="w-full max-w-2xl">
+        <Link href="/" className="mb-4 inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-gray-400 transition-all hover:bg-white/10 hover:text-white">← Home</Link>
         <h1 className="text-glow mb-1 text-center text-4xl font-extrabold">🌊 Color Flood</h1>
         <p className="mb-6 text-center text-sm text-gray-500">Capture the Board!</p>
         <div className="grid gap-4 sm:grid-cols-2">
