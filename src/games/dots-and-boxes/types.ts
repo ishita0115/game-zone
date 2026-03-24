@@ -1,19 +1,17 @@
-export const GRID_ROWS = 5; // dots vertically
-export const GRID_COLS = 6; // dots horizontally
-// boxes = (GRID_ROWS-1) x (GRID_COLS-1)
+import { Difficulty } from "@/types/game";
 
-export type LineDirection = "h" | "v"; // horizontal or vertical
+export type LineDirection = "h" | "v";
 
 export interface Line {
   row: number;
   col: number;
   dir: LineDirection;
-  drawnBy: number | null; // playerIndex or null
+  drawnBy: number | null;
 }
 
 export interface Box {
-  row: number; // top-left dot row
-  col: number; // top-left dot col
+  row: number;
+  col: number;
   owner: number | null;
 }
 
@@ -24,16 +22,26 @@ export interface PlayerState {
 }
 
 export interface GameState {
-  // horizontal lines: (GRID_ROWS) x (GRID_COLS-1)
   hLines: (number | null)[][];
-  // vertical lines: (GRID_ROWS-1) x (GRID_COLS)
   vLines: (number | null)[][];
   boxes: (number | null)[][];
   players: PlayerState[];
   currentPlayer: number;
   playerCount: number;
+  gridRows: number;
+  gridCols: number;
   phase: "setup" | "playing" | "finished";
   winner: number | null;
   totalBoxes: number;
   lastMove: { row: number; col: number; dir: LineDirection } | null;
+  difficulty: Difficulty;
 }
+
+export const DIFFICULTY_CONFIG = {
+  easy: { rows: 4, cols: 4 },
+  medium: { rows: 5, cols: 6 },
+  hard: { rows: 6, cols: 8 },
+} as const;
+
+export const GRID_ROWS = 5;
+export const GRID_COLS = 6;

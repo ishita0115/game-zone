@@ -1,4 +1,5 @@
-export const GRID_SIZE = 10;
+import { Difficulty } from "@/types/game";
+
 export const FLOOD_COLORS = [
   "#ef4444", // red
   "#3b82f6", // blue
@@ -20,7 +21,7 @@ export interface PlayerState {
 
 export interface GameState {
   board: FloodColor[][];
-  ownership: (number | null)[][]; // playerIndex or null
+  ownership: (number | null)[][];
   players: PlayerState[];
   currentPlayer: number;
   playerCount: number;
@@ -28,4 +29,13 @@ export interface GameState {
   phase: "setup" | "playing" | "finished";
   winner: number | null;
   totalCells: number;
+  difficulty: Difficulty;
 }
+
+export const DIFFICULTY_CONFIG = {
+  easy: { gridSize: 8 },
+  medium: { gridSize: 10 },
+  hard: { gridSize: 14 },
+} as const;
+
+export const GRID_SIZE = 10;

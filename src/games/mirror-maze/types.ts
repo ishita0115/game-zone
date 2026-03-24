@@ -1,3 +1,5 @@
+import { Difficulty } from "@/types/game";
+
 export type Direction = "up" | "down" | "left" | "right";
 export type MirrorType = "/" | "\\";
 
@@ -49,8 +51,16 @@ export interface GameState {
   winner: number | null;
   totalGems: number;
   claimedGems: number;
+  difficulty: Difficulty;
 }
 
+export const DIFFICULTY_CONFIG = {
+  easy: { gridSize: 6, gems: 5, mirrors: 8 },
+  medium: { gridSize: 8, gems: 8, mirrors: 12 },
+  hard: { gridSize: 10, gems: 12, mirrors: 15 },
+} as const;
+
+// Keep defaults for backward compat
 export const GRID_SIZE = 8;
 export const MIRRORS_PER_PLAYER = 12;
 export const GEM_COUNT = 8;

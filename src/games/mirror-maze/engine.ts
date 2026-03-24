@@ -1,107 +1,79 @@
 import {
   Cell,
-  CellContent,
+  DIFFICULTY_CONFIG,
   Direction,
   GameState,
-  GEM_COUNT,
-  GRID_SIZE,
   LaserSegment,
   LaserSource,
-  MIRRORS_PER_PLAYER,
   MirrorType,
   PlayerState,
   Position,
 } from "./types";
-import { PLAYER_COLORS } from "@/types/game";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Difficulty, PLAYER_COLORS } from "@/types/game";
 
-function getLaserSources(playerCount: number): LaserSource[] {
+function getLaserSources(playerCount: number, gridSize: number): LaserSource[] {
+  const mid = Math.floor(gridSize / 2);
   const sources: LaserSource[] = [
-    { pos: { row: 3, col: -1 }, direction: "right", playerIndex: 0 },
-    { pos: { row: 4, col: GRID_SIZE }, direction: "left", playerIndex: 1 },
+    { pos: { row: mid - 1, col: -1 }, direction: "right", playerIndex: 0 },
+    { pos: { row: mid, col: gridSize }, direction: "left", playerIndex: 1 },
   ];
   if (playerCount >= 3) {
-    sources.push({
-      pos: { row: -1, col: 4 },
-      direction: "down",
-      playerIndex: 2,
-    });
+    sources.push({ pos: { row: -1, col: mid }, direction: "down", playerIndex: 2 });
   }
   return sources;
 }
 
-function seededRandom(seed: number) {
-  let s = seed;
-  return () => {
-    s = (s * 1664525 + 1013904223) & 0xffffffff;
-    return (s >>> 0) / 0xffffffff;
-  };
-}
-
-function placeGems(board: Cell[][], count: number): void {
-  const rand = seededRandom(Date.now());
+function placeGems(board: Cell[][], count: number, gridSize: number): void {
   const available: Position[] = [];
-
-  for (let r = 0; r < GRID_SIZE; r++) {
-    for (let c = 0; c < GRID_SIZE; c++) {
-      if (board[r][c].content.type === "empty") {
-        available.push({ row: r, col: c });
-      }
+  for (let r = 0; r < gridSize; r++) {
+    for (let c = 0; c < gridSize; c++) {
+      if (board[r][c].content.type === "empty") available.push({ row: r, col: c });
     }
   }
-
   for (let i = available.length - 1; i > 0; i--) {
-    const j = Math.floor(rand() * (i + 1));
+    const j = Math.floor(Math.random() * (i + 1));
     [available[i], available[j]] = [available[j], available[i]];
   }
-
-  const gemPositions = available.slice(0, count);
-  for (const pos of gemPositions) {
-    board[pos.row][pos.col].content = {
-      type: "gem",
-      claimed: false,
-      claimedBy: null,
-    };
+  for (const pos of available.slice(0, count)) {
+    board[pos.row][pos.col].content = { type: "gem", claimed: false, claimedBy: null };
   }
 }
 
 export function createInitialState(
   playerCount: number,
-  playerNames: string[]
+  playerNames: string[],
+  difficulty: Difficulty = "medium"
 ): GameState {
+  const cfg = DIFFICULTY_CONFIG[difficulty];
+  const gridSize = cfg.gridSize;
   const board: Cell[][] = [];
 
-  for (let r = 0; r < GRID_SIZE; r++) {
+  for (let r = 0; r < gridSize; r++) {
     const row: Cell[] = [];
-    for (let c = 0; c < GRID_SIZE; c++) {
+    for (let c = 0; c < gridSize; c++) {
       row.push({ row: r, col: c, content: { type: "empty" } });
     }
     board.push(row);
   }
 
-  placeGems(board, GEM_COUNT);
+  placeGems(board, cfg.gems, gridSize);
 
   const players: PlayerState[] = [];
   for (let i = 0; i < playerCount; i++) {
     players.push({
       name: playerNames[i] || `Player ${i + 1}`,
       score: 0,
-      mirrorsLeft: MIRRORS_PER_PLAYER,
+      mirrorsLeft: cfg.mirrors,
       color: PLAYER_COLORS[i],
     });
   }
 
   const state: GameState = {
-    board,
-    players,
-    currentPlayer: 0,
-    playerCount,
-    gridSize: GRID_SIZE,
-    laserSegments: [],
-    selectedMirror: "/",
-    phase: "playing",
-    winner: null,
-    totalGems: GEM_COUNT,
-    claimedGems: 0,
+    board, players, currentPlayer: 0, playerCount, gridSize,
+    laserSegments: [], selectedMirror: "/",
+    phase: "playing", winner: null,
+    totalGems: cfg.gems, claimedGems: 0, difficulty: difficulty,
   };
 
   state.laserSegments = traceAllLasers(state);
@@ -110,229 +82,123 @@ export function createInitialState(
 
 function move(pos: Position, dir: Direction): Position {
   switch (dir) {
-    case "up":
-      return { row: pos.row - 1, col: pos.col };
-    case "down":
-      return { row: pos.row + 1, col: pos.col };
-    case "left":
-      return { row: pos.row, col: pos.col - 1 };
-    case "right":
-      return { row: pos.row, col: pos.col + 1 };
+    case "up": return { row: pos.row - 1, col: pos.col };
+    case "down": return { row: pos.row + 1, col: pos.col };
+    case "left": return { row: pos.row, col: pos.col - 1 };
+    case "right": return { row: pos.row, col: pos.col + 1 };
   }
 }
 
 function reflect(dir: Direction, mirror: MirrorType): Direction {
   if (mirror === "/") {
-    switch (dir) {
-      case "right":
-        return "up";
-      case "left":
-        return "down";
-      case "up":
-        return "right";
-      case "down":
-        return "left";
-    }
+    switch (dir) { case "right": return "up"; case "left": return "down"; case "up": return "right"; case "down": return "left"; }
   } else {
-    switch (dir) {
-      case "right":
-        return "down";
-      case "left":
-        return "up";
-      case "up":
-        return "left";
-      case "down":
-        return "right";
-    }
+    switch (dir) { case "right": return "down"; case "left": return "up"; case "up": return "left"; case "down": return "right"; }
   }
 }
 
-function inBounds(pos: Position): boolean {
-  return pos.row >= 0 && pos.row < GRID_SIZE && pos.col >= 0 && pos.col < GRID_SIZE;
+function inBounds(pos: Position, gs: number): boolean {
+  return pos.row >= 0 && pos.row < gs && pos.col >= 0 && pos.col < gs;
 }
 
-function traceLaser(
-  source: LaserSource,
-  board: Cell[][]
-): { segments: LaserSegment[]; hitGems: Position[] } {
+function traceLaser(source: LaserSource, board: Cell[][], gs: number) {
   const segments: LaserSegment[] = [];
   const hitGems: Position[] = [];
   let pos: Position = { ...source.pos };
   let dir = source.direction;
-  const maxSteps = 100;
 
-  for (let step = 0; step < maxSteps; step++) {
+  for (let step = 0; step < 200; step++) {
     const next = move(pos, dir);
-
-    if (!inBounds(next)) {
-      if (inBounds(pos)) {
-        segments.push({ from: pos, to: next, playerIndex: source.playerIndex });
-      } else {
-        segments.push({ from: pos, to: next, playerIndex: source.playerIndex });
-      }
+    if (!inBounds(next, gs)) {
+      segments.push({ from: pos, to: next, playerIndex: source.playerIndex });
       break;
     }
-
     segments.push({ from: pos, to: next, playerIndex: source.playerIndex });
-
     const cell = board[next.row][next.col];
-
-    if (cell.content.type === "mirror") {
-      dir = reflect(dir, cell.content.mirrorType);
-    } else if (
-      cell.content.type === "gem" &&
-      !cell.content.claimed
-    ) {
-      hitGems.push({ row: next.row, col: next.col });
-    }
-
+    if (cell.content.type === "mirror") dir = reflect(dir, cell.content.mirrorType);
+    else if (cell.content.type === "gem" && !cell.content.claimed) hitGems.push({ row: next.row, col: next.col });
     pos = next;
   }
-
   return { segments, hitGems };
 }
 
 function traceAllLasers(state: GameState): LaserSegment[] {
-  const sources = getLaserSources(state.playerCount);
-  const allSegments: LaserSegment[] = [];
-
-  for (const source of sources) {
-    const { segments } = traceLaser(source, state.board);
-    allSegments.push(...segments);
-  }
-
-  return allSegments;
+  const sources = getLaserSources(state.playerCount, state.gridSize);
+  const all: LaserSegment[] = [];
+  for (const src of sources) all.push(...traceLaser(src, state.board, state.gridSize).segments);
+  return all;
 }
 
 function claimGems(state: GameState): GameState {
-  const sources = getLaserSources(state.playerCount);
-  const newBoard = state.board.map((row) =>
-    row.map((cell) => ({ ...cell, content: { ...cell.content } }))
-  );
+  const sources = getLaserSources(state.playerCount, state.gridSize);
+  const newBoard = state.board.map((row) => row.map((cell) => ({ ...cell, content: { ...cell.content } })));
   const newPlayers = state.players.map((p) => ({ ...p }));
   let newClaimed = state.claimedGems;
 
   for (const source of sources) {
-    const { hitGems } = traceLaser(source, state.board);
-    for (const gemPos of hitGems) {
-      const cell = newBoard[gemPos.row][gemPos.col];
+    for (const g of traceLaser(source, state.board, state.gridSize).hitGems) {
+      const cell = newBoard[g.row][g.col];
       if (cell.content.type === "gem" && !cell.content.claimed) {
-        cell.content = {
-          type: "gem",
-          claimed: true,
-          claimedBy: source.playerIndex,
-        };
+        cell.content = { type: "gem", claimed: true, claimedBy: source.playerIndex };
         newPlayers[source.playerIndex].score += 1;
         newClaimed++;
       }
     }
   }
-
   return { ...state, board: newBoard, players: newPlayers, claimedGems: newClaimed };
 }
 
-export function placeMirror(
-  state: GameState,
-  row: number,
-  col: number
-): GameState | null {
+export function placeMirror(state: GameState, row: number, col: number): GameState | null {
   if (state.phase !== "playing") return null;
-
   const cell = state.board[row][col];
   if (cell.content.type !== "empty") return null;
-
   const player = state.players[state.currentPlayer];
   if (player.mirrorsLeft <= 0) return null;
 
-  const newBoard = state.board.map((r) =>
-    r.map((c) => ({ ...c, content: { ...c.content } }))
-  );
+  const newBoard = state.board.map((r) => r.map((c) => ({ ...c, content: { ...c.content } })));
   const newPlayers = state.players.map((p) => ({ ...p }));
-
-  newBoard[row][col].content = {
-    type: "mirror",
-    mirrorType: state.selectedMirror,
-    playerIndex: state.currentPlayer,
-  };
+  newBoard[row][col].content = { type: "mirror", mirrorType: state.selectedMirror, playerIndex: state.currentPlayer };
   newPlayers[state.currentPlayer].mirrorsLeft -= 1;
 
-  let newState: GameState = {
-    ...state,
-    board: newBoard,
-    players: newPlayers,
-  };
+  let ns: GameState = { ...state, board: newBoard, players: newPlayers };
+  ns.laserSegments = traceAllLasers(ns);
+  ns = claimGems(ns);
 
-  newState.laserSegments = traceAllLasers(newState);
-  newState = claimGems(newState);
-
-  if (newState.claimedGems >= newState.totalGems || allMirrorsUsed(newState)) {
-    newState.phase = "finished";
-    newState.winner = getWinner(newState);
+  if (ns.claimedGems >= ns.totalGems || ns.players.every((p) => p.mirrorsLeft <= 0)) {
+    ns.phase = "finished"; ns.winner = getWinner(ns);
   } else {
-    newState.currentPlayer =
-      (state.currentPlayer + 1) % state.playerCount;
+    ns.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
   }
-
-  return newState;
+  return ns;
 }
 
-export function rotateMirror(
-  state: GameState,
-  row: number,
-  col: number
-): GameState | null {
+export function rotateMirror(state: GameState, row: number, col: number): GameState | null {
   if (state.phase !== "playing") return null;
-
   const cell = state.board[row][col];
-  if (
-    cell.content.type !== "mirror" ||
-    cell.content.playerIndex !== state.currentPlayer
-  ) {
-    return null;
-  }
+  if (cell.content.type !== "mirror" || cell.content.playerIndex !== state.currentPlayer) return null;
 
-  const newBoard = state.board.map((r) =>
-    r.map((c) => ({ ...c, content: { ...c.content } }))
-  );
+  const newBoard = state.board.map((r) => r.map((c) => ({ ...c, content: { ...c.content } })));
+  const cur = (cell.content as { mirrorType: MirrorType }).mirrorType;
+  newBoard[row][col].content = { type: "mirror", mirrorType: cur === "/" ? "\\" : "/", playerIndex: state.currentPlayer };
 
-  const currentMirror = (cell.content as { mirrorType: MirrorType }).mirrorType;
-  newBoard[row][col].content = {
-    type: "mirror",
-    mirrorType: currentMirror === "/" ? "\\" : "/",
-    playerIndex: state.currentPlayer,
-  };
+  let ns: GameState = { ...state, board: newBoard };
+  ns.laserSegments = traceAllLasers(ns);
+  ns = claimGems(ns);
 
-  let newState: GameState = { ...state, board: newBoard };
-  newState.laserSegments = traceAllLasers(newState);
-  newState = claimGems(newState);
-
-  if (newState.claimedGems >= newState.totalGems) {
-    newState.phase = "finished";
-    newState.winner = getWinner(newState);
+  if (ns.claimedGems >= ns.totalGems) {
+    ns.phase = "finished"; ns.winner = getWinner(ns);
   } else {
-    newState.currentPlayer =
-      (state.currentPlayer + 1) % state.playerCount;
+    ns.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
   }
-
-  return newState;
-}
-
-function allMirrorsUsed(state: GameState): boolean {
-  return state.players.every((p) => p.mirrorsLeft <= 0);
+  return ns;
 }
 
 function getWinner(state: GameState): number {
-  let maxScore = -1;
-  let winner = 0;
-  for (let i = 0; i < state.players.length; i++) {
-    if (state.players[i].score > maxScore) {
-      maxScore = state.players[i].score;
-      winner = i;
-    }
-  }
-  return winner;
+  let max = -1, w = 0;
+  state.players.forEach((p, i) => { if (p.score > max) { max = p.score; w = i; } });
+  return w;
 }
 
-export function getLaserSourcePositions(playerCount: number): LaserSource[] {
-  return getLaserSources(playerCount);
+export function getLaserSourcePositions(playerCount: number, gridSize: number): LaserSource[] {
+  return getLaserSources(playerCount, gridSize);
 }

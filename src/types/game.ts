@@ -1,4 +1,17 @@
 export type GameCategory = "adult" | "kids";
+export type Difficulty = "easy" | "medium" | "hard";
+
+export interface DifficultyConfig {
+  label: string;
+  emoji: string;
+  color: string;
+}
+
+export const DIFFICULTIES: Record<Difficulty, DifficultyConfig> = {
+  easy: { label: "Easy", emoji: "🟢", color: "#22c55e" },
+  medium: { label: "Medium", emoji: "🟡", color: "#f59e0b" },
+  hard: { label: "Hard", emoji: "🔴", color: "#ef4444" },
+};
 
 export interface GameInfo {
   id: string;
@@ -14,12 +27,10 @@ export interface GameInfo {
 }
 
 export const GAMES: GameInfo[] = [
-  // ===== ADULT / STRATEGY GAMES =====
   {
     id: "mirror-maze",
     name: "Mirror Maze",
-    description:
-      "Place mirrors to reflect laser beams and hit gems! A brain-bending strategy game of light and angles.",
+    description: "Place mirrors to reflect laser beams and hit gems!",
     emoji: "🪞",
     minPlayers: 2,
     maxPlayers: 3,
@@ -31,8 +42,7 @@ export const GAMES: GameInfo[] = [
   {
     id: "color-flood",
     name: "Color Flood",
-    description:
-      "Pick colors to flood and expand your territory! A colorful battle of area control.",
+    description: "Pick colors to flood and expand your territory!",
     emoji: "🌊",
     minPlayers: 2,
     maxPlayers: 3,
@@ -44,8 +54,7 @@ export const GAMES: GameInfo[] = [
   {
     id: "dots-and-boxes",
     name: "Dots & Boxes",
-    description:
-      "Draw lines between dots to complete boxes and claim them! A classic game of clever moves.",
+    description: "Draw lines between dots to complete boxes!",
     emoji: "🔲",
     minPlayers: 2,
     maxPlayers: 3,
@@ -54,12 +63,10 @@ export const GAMES: GameInfo[] = [
     category: "adult",
     tag: "Classic",
   },
-  // ===== KIDS GAMES =====
   {
     id: "memory-match",
     name: "Memory Match",
-    description:
-      "Flip cards and find matching pairs! Test your memory in this fun and colorful card game.",
+    description: "Flip cards and find matching emoji pairs!",
     emoji: "🃏",
     minPlayers: 2,
     maxPlayers: 3,
@@ -71,8 +78,7 @@ export const GAMES: GameInfo[] = [
   {
     id: "tic-tac-toe",
     name: "Tic Tac Toe",
-    description:
-      "The classic X and O game! Get three in a row to win. Simple, fast, and super fun!",
+    description: "Classic X and O — get three in a row to win!",
     emoji: "❌⭕",
     minPlayers: 2,
     maxPlayers: 2,
