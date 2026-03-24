@@ -10,24 +10,161 @@
 }
 
 body {
-  background: linear-gradient(135deg, #0c0a1a 0%, #1a0e2e 50%, #0c0a1a 100%);
+  background: #050510;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
+/* ===== Animated gradient background ===== */
+.bg-animate {
+  background: linear-gradient(135deg, #050510 0%, #0a0a2e 25%, #150a30 50%, #0a0a2e 75%, #050510 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ===== Floating particles effect ===== */
+.particles::before,
+.particles::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.08;
+  animation: float 20s ease-in-out infinite;
+}
+
+.particles::before {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #8b5cf6, transparent);
+  top: -100px;
+  right: -100px;
+}
+
+.particles::after {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #06b6d4, transparent);
+  bottom: -150px;
+  left: -150px;
+  animation-delay: -7s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -40px) scale(1.1); }
+  66% { transform: translate(-20px, 30px) scale(0.9); }
+}
+
+/* ===== Glass card style ===== */
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-hover:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== Text glow ===== */
 @layer utilities {
   .text-glow {
-    text-shadow: 0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(139, 92, 246, 0.3);
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.5), 0 0 60px rgba(139, 92, 246, 0.2);
+  }
+  .text-glow-cyan {
+    text-shadow: 0 0 20px rgba(6, 182, 212, 0.5), 0 0 60px rgba(6, 182, 212, 0.2);
+  }
+  .text-glow-orange {
+    text-shadow: 0 0 20px rgba(249, 115, 22, 0.5), 0 0 60px rgba(249, 115, 22, 0.2);
   }
   .gem-glow {
     filter: drop-shadow(0 0 6px var(--gem-color));
   }
-  .laser-glow-1 {
-    filter: drop-shadow(0 0 4px var(--player-1));
-  }
-  .laser-glow-2 {
-    filter: drop-shadow(0 0 4px var(--player-2));
-  }
-  .laser-glow-3 {
-    filter: drop-shadow(0 0 4px var(--player-3));
-  }
+}
+
+/* ===== Shine effect on cards ===== */
+.card-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-shine::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.03) 45%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.03) 55%,
+    transparent 60%
+  );
+  transform: translateX(-100%) rotate(0deg);
+  transition: none;
+  pointer-events: none;
+}
+
+.card-shine:hover::before {
+  transform: translateX(100%) rotate(0deg);
+  transition: transform 0.8s ease;
+}
+
+/* ===== Pulse animation ===== */
+@keyframes pulseGlow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.5); }
+}
+
+@keyframes laserFlow {
+  0% { stroke-dashoffset: 20; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.animate-bounce-in {
+  animation: bounceIn 0.5s ease-out;
+}
+
+/* ===== Section divider ===== */
+.section-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.5);
 }

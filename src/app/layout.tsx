@@ -13,7 +13,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="text-white antialiased">{children}</body>
+      <body className="bg-animate particles text-white antialiased">
+        {children}
+      </body>
     </html>
   );
 }
