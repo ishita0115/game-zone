@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --player-1: #06b6d4;
+  --player-2: #f43f5e;
+  --player-3: #f59e0b;
+  --gem-color: #a78bfa;
+}
+
+body {
+  background: linear-gradient(135deg, #0c0a1a 0%, #1a0e2e 50%, #0c0a1a 100%);
+  min-height: 100vh;
+}
+
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(139, 92, 246, 0.3);
+  }
+  .gem-glow {
+    filter: drop-shadow(0 0 6px var(--gem-color));
+  }
+  .laser-glow-1 {
+    filter: drop-shadow(0 0 4px var(--player-1));
+  }
+  .laser-glow-2 {
+    filter: drop-shadow(0 0 4px var(--player-2));
+  }
+  .laser-glow-3 {
+    filter: drop-shadow(0 0 4px var(--player-3));
+  }
+}
