@@ -21,6 +21,17 @@ export const GAMES: GameInfo[] = [
     route: "/games/mirror-maze",
     color: "from-violet-600 to-cyan-500",
   },
+  {
+    id: "color-flood",
+    name: "Color Flood",
+    description:
+      "Pick colors to flood your territory and capture the board! A colorful strategy game of expansion and control.",
+    emoji: "🌊",
+    minPlayers: 2,
+    maxPlayers: 3,
+    route: "/games/color-flood",
+    color: "from-emerald-600 to-teal-500",
+  },
 ];
 
 export const PLAYER_COLORS = ["#06b6d4", "#f43f5e", "#f59e0b"] as const;
