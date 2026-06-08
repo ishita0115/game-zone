@@ -87,6 +87,18 @@ export const GAMES: GameInfo[] = [
     category: "kids",
     tag: "Classic",
   },
+  {
+    id: "connect-four",
+    name: "Connect Four",
+    description: "Drop tokens into the grid and connect 4 in a row to win!",
+    emoji: "🔴",
+    minPlayers: 2,
+    maxPlayers: 2,
+    route: "/games/connect-four",
+    color: "from-red-500 via-rose-500 to-pink-500",
+    category: "adult",
+    tag: "Classic",
+  },
 ];
 
 export const PLAYER_COLORS = ["#06b6d4", "#f43f5e", "#f59e0b"] as const;
